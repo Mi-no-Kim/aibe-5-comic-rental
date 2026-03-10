@@ -369,4 +369,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+# ConnectionConst
+src/util/ConnectionConst.java
+
 # End of https://www.toptal.com/developers/gitignore/api/java,eclipse,intellij,visualstudiocode,macos,windows,gradle,intellij+all

@@ -52,6 +52,12 @@ public class App {
 				case "comic-detail":
 					comicController.comicDetail(rq);
 					break;
+				case "comic-update":
+					comicController.comicUpdate(rq);
+					break;
+				case "comic-delete":
+					comicController.comicDelete(rq);
+					break;
 				case "exit":
 					System.out.println("프로그램을 종료합니다.");
 					return;

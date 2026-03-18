@@ -167,4 +167,81 @@ public class ComicRepository {
 
         return comics;
     }
+    /*
+     * 만화책 수정
+     * 제목, 작가, 권수 수정
+     */
+    public boolean updateComic(Comic comic) {
+        String sql = """
+                UPDATE comic
+                SET title = ?, author = ?, volume = ?
+                WHERE id = ?
+                """;
+
+        try (
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setString(1, comic.getTitle());
+            pstmt.setString(2, comic.getAuthor());
+            pstmt.setInt(3, comic.getVolume());
+            pstmt.setInt(4, comic.getId());
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) {
+                System.out.println("=> 같은 제목, 작가, 권수의 만화책이 이미 존재합니다.");
+            } else {
+                System.out.println("=> 만화책 수정 중 오류가 발생했습니다.");
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    /*
+     * id로 만화책 삭제
+     */
+    public boolean deleteById(int id) {
+        String sql = "DELETE FROM comic WHERE id = ?";
+
+        try (
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("=> 만화책 삭제 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /*
+     * 대여 상태 변경
+     * Rental 파트에서 사용할 수 있게 미리 작성
+     */
+    public boolean updateRentalStatus(int comicId, boolean isRental) {
+        String sql = "UPDATE comic SET is_rental = ? WHERE id = ?";
+
+        try (
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setBoolean(1, isRental);
+            pstmt.setInt(2, comicId);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("=> 대여 상태 변경 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

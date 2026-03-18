@@ -113,4 +113,91 @@ public class ComicController {
 
         System.out.println("--------------------------------------------------------");
     }
+    /*
+     * comic-detail [comic.id]
+     * 예) comic-detail 1
+     */
+    public void comicDetail(Rq rq) {
+        List<String> params = rq.getParams();
+
+        if (params.isEmpty()) {
+            System.out.println("=> 사용법: comic-detail [comic.id]");
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(params.get(0));
+        } catch (NumberFormatException e) {
+            System.out.println("=> 만화책 번호는 숫자로 입력해야 합니다.");
+            return;
+        }
+
+        if (id <= 0) {
+            System.out.println("=> 올바른 만화책 번호를 입력해야 합니다.");
+            return;
+        }
+
+        Comic comic = comicRepository.findById(id);
+
+        if (comic == null) {
+            System.out.println("=> 해당 번호의 만화책이 존재하지 않습니다.");
+            return;
+        }
+
+        System.out.println("-------------------------------------");
+        System.out.println("만화책 상세 정보");
+        System.out.println("번호 : " + comic.getId());
+        System.out.println("제목 : " + comic.getTitle());
+        System.out.println("권수 : " + comic.getVolume());
+        System.out.println("작가 : " + comic.getAuthor());
+        System.out.println("상태 : " + (comic.isRented() ? "대여중" : "대여가능"));
+        System.out.println("등록일 : " + comic.getRegDate());
+        System.out.println("-------------------------------------");
+    }
+
+    /*
+     * comic-search [keyword]
+     * 예) comic-search 슬램
+     * 예) comic-search "오다 에이치로"
+     */
+    public void comicSearch(Rq rq) {
+        List<String> params = rq.getParams();
+
+        if (params.isEmpty()) {
+            System.out.println("=> 사용법: comic-search [keyword]");
+            return;
+        }
+
+        String keyword = params.get(0);
+
+        if (keyword.isBlank()) {
+            System.out.println("=> 검색어를 입력해야 합니다.");
+            return;
+        }
+
+        List<Comic> comics = comicRepository.searchByKeyword(keyword);
+
+        if (comics.isEmpty()) {
+            System.out.println("=> 검색 결과가 없습니다.");
+            return;
+        }
+
+        System.out.println("검색 결과");
+        System.out.println("번호 | 제목 | 권수 | 작가 | 상태");
+        System.out.println("---------------------------------------------------------");
+
+        for (Comic comic : comics) {
+            String status = comic.isRented() ? "대여중" : "대여가능";
+
+            System.out.printf("%d | %s | %d | %s | %s%n",
+                    comic.getId(),
+                    comic.getTitle(),
+                    comic.getVolume(),
+                    comic.getAuthor(),
+                    status);
+        }
+
+        System.out.println("---------------------------------------------------------");
+    }
 }

@@ -94,4 +94,77 @@ public class ComicRepository {
 
         return comics;
     }
+    /*
+     * id로 만화책 1권 조회
+     * 없으면 null 반환
+     */
+    public Comic findById(int id) {
+        String sql = "SELECT * FROM comic WHERE id = ?";
+
+        try (
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Comic comic = new Comic();
+                    comic.setId(rs.getInt("id"));
+                    comic.setTitle(rs.getString("title"));
+                    comic.setAuthor(rs.getString("author"));
+                    comic.setVolume(rs.getInt("volume"));
+                    comic.setRented(rs.getBoolean("is_rental"));
+                    comic.setRegDate(rs.getDate("reg_date").toLocalDate());
+                    return comic;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("=> 만화책 상세 조회 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /*
+     * 제목 또는 작가 기준 검색
+     */
+    public List<Comic> searchByKeyword(String keyword) {
+        List<Comic> comics = new ArrayList<>();
+
+        String sql = """
+                SELECT * FROM comic
+                WHERE title LIKE ? OR author LIKE ?
+                ORDER BY reg_date DESC, id DESC
+                """;
+
+        try (
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            String likeKeyword = "%" + keyword + "%";
+            pstmt.setString(1, likeKeyword);
+            pstmt.setString(2, likeKeyword);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Comic comic = new Comic();
+                    comic.setId(rs.getInt("id"));
+                    comic.setTitle(rs.getString("title"));
+                    comic.setAuthor(rs.getString("author"));
+                    comic.setVolume(rs.getInt("volume"));
+                    comic.setRented(rs.getBoolean("is_rental"));
+                    comic.setRegDate(rs.getDate("reg_date").toLocalDate());
+
+                    comics.add(comic);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("=> 만화책 검색 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return comics;
+    }
 }

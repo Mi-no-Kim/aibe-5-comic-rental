@@ -46,6 +46,12 @@ public class App {
 				case "comic-list":
 					comicController.comicList(rq);
 					break;
+				case "comic-search":
+					comicController.comicSearch(rq);
+					break;
+				case "comic-detail":
+					comicController.comicDetail(rq);
+					break;
 				case "exit":
 					System.out.println("프로그램을 종료합니다.");
 					return;

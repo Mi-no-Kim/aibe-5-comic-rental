@@ -28,6 +28,10 @@ public class RentalController {
         this.memberRepository = new MemberRepository();
     }
 
+    public void setDateHolder(DateHolder dateHolder) {
+        this.dateHolder = dateHolder;
+    }
+
     /*
      * rental-rent [comic.id] [member.id]
      * 예) rental-rent 1 2

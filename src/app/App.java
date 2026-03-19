@@ -1,6 +1,7 @@
 package app;
 
 import contoller.ComicController;
+import contoller.RentalController;
 import util.DateHolder;
 import util.Rq;
 
@@ -13,6 +14,7 @@ public class App {
 
 	private final Scanner sc;
 	private final ComicController comicController;
+	private final RentalController rentalController;
 	private final DateHolder dateHolder = new DateHolder();
 
 	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
@@ -22,6 +24,8 @@ public class App {
 	public App() {
 		this.sc = new Scanner(System.in);
 		this.comicController = new ComicController();
+		this.rentalController = new RentalController();
+		this.rentalController.setDateHolder(this.dateHolder);
 
 		commandMap.put("comic-add", comicController::comicAdd);
 		commandMap.put("comic-list", comicController::comicList);

@@ -2,11 +2,11 @@ package app;
 
 import contoller.ComicController;
 import contoller.RentalController;
+import util.DateHolder;
 import util.Rq;
 
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class App {
@@ -14,8 +14,9 @@ public class App {
 	private final Scanner sc;
 	private final ComicController comicController;
 	private final RentalController rentalController;
+	private final DateHolder dateHolder = new DateHolder();
 
-	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
+	private final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
 
 	private boolean runState = true;
 
@@ -23,6 +24,7 @@ public class App {
 		this.sc = new Scanner(System.in);
 		this.comicController = new ComicController();
 		this.rentalController = new RentalController();
+		this.rentalController.setDateHolder(this.dateHolder);
 
 		commandMap.put("comic-add", comicController::comicAdd);
 		commandMap.put("comic-list", comicController::comicList);

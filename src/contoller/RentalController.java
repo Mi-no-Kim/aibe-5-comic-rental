@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class RentalController {
+    private DateHolder dateHolder;
 
     private final RentalRepository rentalRepository;
     private final ComicRepository comicRepository;

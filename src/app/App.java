@@ -1,13 +1,14 @@
 package app;
 
-import contoller.ComicController;
-import contoller.MemberController;
-import contoller.RentalController;
 import util.DateHolder;
 import util.Rq;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.function.Consumer;
+
+import controller.ComicController;
+import controller.MemberController;
+import controller.RentalController;
 
 public class App {
 
@@ -35,6 +36,10 @@ public class App {
 		commandMap.put("comic-update", comicController::comicUpdate);
 		commandMap.put("comic-delete", comicController::comicDelete);
 		
+		// rental 명령어
+		commandMap.put("rental-rent", rentalController::rentalRent);
+		commandMap.put("rental-return", rentalController::rentalReturn);
+		commandMap.put("rental-list", rentalController::rentalList);
 		
 		// member
 		commandMap.put("member-add", rq -> memberController.addMember());
@@ -56,6 +61,8 @@ public class App {
 		    int id = Integer.parseInt(rq.getParams().get(0));
 		    memberController.updateMember(id);
 		});
+
+		
 
 		commandMap.put("exit", this::exit);
 	}

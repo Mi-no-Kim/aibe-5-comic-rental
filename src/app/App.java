@@ -1,6 +1,7 @@
 package app;
 
 import contoller.ComicController;
+import contoller.RentalController;
 import util.Rq;
 
 import java.util.HashMap;
@@ -12,6 +13,7 @@ public class App {
 
 	private final Scanner sc;
 	private final ComicController comicController;
+	private final RentalController rentalController;
 
 	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
 
@@ -20,6 +22,7 @@ public class App {
 	public App() {
 		this.sc = new Scanner(System.in);
 		this.comicController = new ComicController();
+		this.rentalController = new RentalController();
 
 		commandMap.put("comic-add", comicController::comicAdd);
 		commandMap.put("comic-list", comicController::comicList);
@@ -27,6 +30,11 @@ public class App {
 		commandMap.put("comic-search", comicController::comicSearch);
 		commandMap.put("comic-update", comicController::comicUpdate);
 		commandMap.put("comic-delete", comicController::comicDelete);
+
+		// rental 명령어
+		commandMap.put("rental-rent", rentalController::rentalRent);
+		commandMap.put("rental-return", rentalController::rentalReturn);
+		commandMap.put("rental-list", rentalController::rentalList);
 
 		commandMap.put("exit", this::exit);
 	}

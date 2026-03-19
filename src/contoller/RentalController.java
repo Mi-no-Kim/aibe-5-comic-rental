@@ -1,5 +1,6 @@
 package contoller;
 
+
 import domain.Comic;
 import domain.Member;
 import domain.Rental;
@@ -27,7 +28,7 @@ public class RentalController {
 
     /*
      * rental-rent [comic.id] [member.id]
-     * 예) rental-rent 1 2 (1번 만화책을 2번 회원이 대여, 대여 기간은 기본 7일로 설정)
+     * 예) rental-rent 1 2
      */
     public void rentalRent(Rq rq) {
         List<String> params = rq.getParams();
@@ -48,44 +49,43 @@ public class RentalController {
             return;
         }
 
-        // 1. 만화책 존재 및 대여 가능 여부 확인 (앞서 공유받은 Comic 도메인 메서드 기준)
-        // 주의: ComicController에서는 findById를 썼고, Repository 예시에서는 findOne을 썼으므로 프로젝트 상황에 맞게 메서드명을 맞춰야 해.
-        Optional<Comic> comicOpt = comicRepository.findOne(comicId);
-        if (comicOpt.isEmpty()) {
+        // 1. 만화책 존재 및 대여 가능 여부 확인 (팀원이 만든 findById 사용)
+        Comic comic = comicRepository.findById(comicId);
+
+        if (comic == null) {
             System.out.println("=> 해당 번호의 만화책이 존재하지 않습니다.");
             return;
         }
-        Comic comic = comicOpt.get();
-        if (comic.isRental()) {
+
+        // 도메인 메서드명에 따라 isRented() 혹은 isRental() 사용
+        if (comic.isRented()) {
             System.out.println("=> 현재 대여 중인 만화책입니다.");
             return;
         }
 
-        // 2. 회원 존재 및 패널티 여부 확인
-        Optional<Member> memberOpt = memberRepository.findOne(memberId);
-        if (memberOpt.isEmpty()) {
-            System.out.println("=> 해당 번호의 회원이 존재하지 않습니다.");
-            return;
-        }
-        Member member = memberOpt.get();
+//        // 2. 회원 존재 및 패널티 여부 확인
+        // Todo: member 업데이트 후 메소드 이름 확인해 사용
+//        Optional<Member> memberOpt = memberRepository.findOne(memberId);
+//        if (memberOpt.isEmpty()) {
+//            System.out.println("=> 해당 번호의 회원이 존재하지 않습니다.");
+//            return;
+//        }
+//        Member member = memberOpt.get();
+//
+//        if (member.getPenaltyDate() != null && member.getPenaltyDate().isAfter(LocalDate.now())) {
+//            System.out.println("=> 해당 회원은 연체 패널티로 인해 " + member.getPenaltyDate() + " 까지 대여가 불가능합니다.");
+//            return;
+//        }
 
-        // 회원의 패널티 날짜가 오늘보다 뒤에 있다면 대여 불가 처리
-        if (member.getPenaltyDate() != null && member.getPenaltyDate().isAfter(LocalDate.now())) {
-            System.out.println("=> 해당 회원은 연체 패널티로 인해 " + member.getPenaltyDate() + " 까지 대여가 불가능합니다.");
-            return;
-        }
-
-        // 3. 대여 기록 생성 및 DB 저장 (기본 대여일 7일)
+        // 3. 대여 기록 생성 및 저장
         LocalDate dueDate = LocalDate.now().plusDays(7);
         Rental newRental = new Rental(comicId, memberId, dueDate);
 
-        boolean isSaved = rentalRepository.save(newRental);
+        boolean isSaved = rentalRepository.saveRental(newRental);
 
         if (isSaved) {
-            // 4. 만화책 상태를 '대여 중'으로 업데이트
-            comic.setRental(true);
-            comicRepository.updateComic(comic);
-
+            // 4. 만화책 상태를 '대여 중(true)'으로 업데이트
+            comicRepository.updateRentalStatus(comicId, true);
             System.out.println("=> 대여가 완료되었습니다. 반납 예정일은 " + dueDate + " 입니다.");
         } else {
             System.out.println("=> 대여 처리에 실패했습니다.");
@@ -94,7 +94,7 @@ public class RentalController {
 
     /*
      * rental-return [rental.id]
-     * 예) rental-return 1 (1번 대여 기록 반납)
+     * 예) rental-return 1
      */
     public void rentalReturn(Rq rq) {
         List<String> params = rq.getParams();
@@ -133,23 +133,18 @@ public class RentalController {
         if (isUpdated) {
             System.out.println("=> 반납 처리가 완료되었습니다.");
 
-            // 연체 패널티 계산 로직 (앞서 설명했던 내용 적용)
             LocalDate dueDate = rental.getDueDate();
             if (today.isAfter(dueDate)) {
                 long overdueDays = ChronoUnit.DAYS.between(dueDate, today);
                 LocalDate penaltyDate = today.plusDays(overdueDays);
 
-                memberRepository.updatePenaltyDate(rental.getMemberId(), penaltyDate);
+//              memberRepository.updatePenaltyDate(rental.getMemberId(), penaltyDate);
+                //TODO: memberRepository 기능 업데이트 후 추가
                 System.out.println("=> [경고] " + overdueDays + "일 연체되어 " + penaltyDate + " 까지 대여가 정지됩니다.");
             }
 
-            // 3. 만화책 상태를 '대여 가능'으로 원복
-            Optional<Comic> comicOpt = comicRepository.findOne(rental.getComicId());
-            if (comicOpt.isPresent()) {
-                Comic comic = comicOpt.get();
-                comic.setRental(false);
-                comicRepository.updateComic(comic);
-            }
+            // 3. 만화책 상태를 '대여 가능(false)'으로 업데이트
+            comicRepository.updateRentalStatus(rental.getComicId(), false);
 
         } else {
             System.out.println("=> 반납 처리에 실패했습니다.");

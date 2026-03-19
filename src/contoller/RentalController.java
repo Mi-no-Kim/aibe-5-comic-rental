@@ -7,6 +7,7 @@ import domain.Rental;
 import repository.ComicRepository;
 import repository.MemberRepository;
 import repository.RentalRepository;
+import util.DateHolder;
 import util.Rq;
 
 import java.time.LocalDate;

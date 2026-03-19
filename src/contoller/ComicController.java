@@ -74,18 +74,25 @@ public class ComicController {
 
     /*
      * comic-list
-     * comic-list asc
-     * comic-list desc
+     * comic-list --asc
+     * comic-list --desc
      */
     public void comicList(Rq rq) {
         List<String> params = rq.getParams();
-
-        String order = "desc";
+        String order = "asc"; // 기본 정렬 방향
 
         if (!params.isEmpty()) {
             String inputOrder = params.get(0).toLowerCase();
-            if (inputOrder.equals("asc") || inputOrder.equals("desc")) {
-                order = inputOrder;
+
+            if (inputOrder.equals("--asc")) {
+                order = "asc";
+            } else if (inputOrder.equals("--desc")) {
+                order = "desc";
+            } else {
+                System.out.println("=> 사용법: comic-list [option]");
+                System.out.println("   --asc                          -> 오름차순 정렬 (기본 정렬 방향)");
+                System.out.println("   --desc                         -> 내림차순 정렬");
+                return;
             }
         }
 

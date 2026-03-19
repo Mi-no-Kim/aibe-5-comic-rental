@@ -1,6 +1,7 @@
 package app;
 
 import contoller.ComicController;
+import util.DateHolder;
 import util.Rq;
 
 import java.util.HashMap;
@@ -12,6 +13,7 @@ public class App {
 
 	private final Scanner sc;
 	private final ComicController comicController;
+	private final DateHolder dateHolder = new DateHolder();
 
 	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
 

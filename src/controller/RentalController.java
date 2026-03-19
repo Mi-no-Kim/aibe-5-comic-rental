@@ -32,9 +32,9 @@ public class RentalController {
         this.dateHolder = dateHolder;
     }
 
-    /*
-     * rental-rent [comic.id] [member.id]
-     * 예) rental-rent 1 2
+    /**
+     * 도서 대여 기능. 유효한 대여인지와 연체 패널티 등 검사 포함
+     * @param rq 문자열 파싱객체 rq
      */
     public void rentalRent(Rq rq) {
         List<String> params = rq.getParams();
@@ -55,7 +55,7 @@ public class RentalController {
             return;
         }
 
-        // 1. 만화책 존재 및 대여 가능 여부 확인 (팀원이 만든 findById 사용)
+        // 1. 만화책 존재 및 대여 가능 여부 확인
         Comic comic = comicRepository.findById(comicId);
 
         if (comic == null) {
@@ -69,22 +69,21 @@ public class RentalController {
             return;
         }
 
-//        // 2. 회원 존재 및 패널티 여부 확인
-        // Todo: member 업데이트 후 메소드 이름 확인해 사용
-//        Optional<Member> memberOpt = memberRepository.findOne(memberId);
-//        if (memberOpt.isEmpty()) {
-//            System.out.println("=> 해당 번호의 회원이 존재하지 않습니다.");
-//            return;
-//        }
-//        Member member = memberOpt.get();
-//
-//        if (member.getPenaltyDate() != null && member.getPenaltyDate().isAfter(LocalDate.now())) {
-//            System.out.println("=> 해당 회원은 연체 패널티로 인해 " + member.getPenaltyDate() + " 까지 대여가 불가능합니다.");
-//            return;
-//        }
+        // 회원 존재 여부 + 패널티 확인
+        Member member = memberRepository.findById(memberId);
+
+        if (member == null) {
+            System.out.println("=> 해당 번호의 회원이 존재하지 않습니다.");
+            return;
+        }
+
+        if (member.getPenaltyDate() != null && member.getPenaltyDate().isAfter(dateHolder.getDate())) {
+            System.out.println("=> 해당 회원은 연체 패널티로 인해 " + member.getPenaltyDate() + " 까지 대여가 불가능합니다.");
+            return;
+        }
 
         // 3. 대여 기록 생성 및 저장
-        LocalDate dueDate = LocalDate.now().plusDays(7);
+        LocalDate dueDate = dateHolder.getDate().plusDays(7);
         Rental newRental = new Rental(comicId, memberId, dueDate);
 
         boolean isSaved = rentalRepository.saveRental(newRental);
@@ -98,9 +97,9 @@ public class RentalController {
         }
     }
 
-    /*
-     * rental-return [rental.id]
-     * 예) rental-return 1
+    /**
+     * 대여한 책 반납하는 기능, 대여기록을 확인하는 로직과 연체 패널티 부여 로직 포함
+     * @param rq 문자열 파싱객체 rq
      */
     public void rentalReturn(Rq rq) {
         List<String> params = rq.getParams();
@@ -133,7 +132,7 @@ public class RentalController {
         }
 
         // 2. 반납 처리 및 연체 계산
-        LocalDate today = LocalDate.now();
+        LocalDate today = dateHolder.getDate();
         boolean isUpdated = rentalRepository.updateReturnDate(rentalId, today);
 
         if (isUpdated) {
@@ -144,8 +143,8 @@ public class RentalController {
                 long overdueDays = ChronoUnit.DAYS.between(dueDate, today);
                 LocalDate penaltyDate = today.plusDays(overdueDays);
 
-//              memberRepository.updatePenaltyDate(rental.getMemberId(), penaltyDate);
-                //TODO: memberRepository 기능 업데이트 후 추가
+                // 연체 패널티
+                memberRepository.updatePenaltyDate(rental.getMemberId(), penaltyDate);
                 System.out.println("=> [경고] " + overdueDays + "일 연체되어 " + penaltyDate + " 까지 대여가 정지됩니다.");
             }
 
@@ -157,8 +156,9 @@ public class RentalController {
         }
     }
 
-    /*
-     * rental-list
+    /**
+     * 전체 대여 기록 조회기능
+     * @param rq 문자열 파싱 객체
      */
     public void rentalList(Rq rq) {
         List<Rental> rentals = rentalRepository.findAll();

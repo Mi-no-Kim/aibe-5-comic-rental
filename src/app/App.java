@@ -5,7 +5,6 @@ import util.Rq;
 
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class App {
@@ -13,7 +12,7 @@ public class App {
 	private final Scanner sc;
 	private final ComicController comicController;
 
-	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
+	private final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
 
 	private boolean runState = true;
 

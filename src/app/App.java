@@ -3,16 +3,32 @@ package app;
 import contoller.ComicController;
 import util.Rq;
 
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 public class App {
 
 	private final Scanner sc;
 	private final ComicController comicController;
 
+	private static final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
+
+	private boolean runState = true;
+
 	public App() {
 		this.sc = new Scanner(System.in);
 		this.comicController = new ComicController();
+
+		commandMap.put("comic-add", comicController::comicAdd);
+		commandMap.put("comic-list", comicController::comicList);
+		commandMap.put("comic-detail", comicController::comicDetail);
+		commandMap.put("comic-search", comicController::comicSearch);
+		commandMap.put("comic-update", comicController::comicUpdate);
+		commandMap.put("comic-delete", comicController::comicDelete);
+
+		commandMap.put("exit", this::exit);
 	}
 
 	public void run() {
@@ -32,38 +48,19 @@ public class App {
 			Rq rq;
 			try {
 				rq = new Rq(cmd);
+				String command = rq.getCommand();
+				Consumer<Rq> function = commandMap.get(command);
+				function.accept(rq);
+
+				if (!runState) break;
 			} catch (Exception e) {
 				System.out.println("=> 명령어 형식이 올바르지 않습니다.");
-				continue;
-			}
-
-			String command = rq.getCommand();
-
-			switch (command) {
-				case "comic-add":
-					comicController.comicAdd(rq);
-					break;
-				case "comic-list":
-					comicController.comicList(rq);
-					break;
-				case "comic-search":
-					comicController.comicSearch(rq);
-					break;
-				case "comic-detail":
-					comicController.comicDetail(rq);
-					break;
-				case "comic-update":
-					comicController.comicUpdate(rq);
-					break;
-				case "comic-delete":
-					comicController.comicDelete(rq);
-					break;
-				case "exit":
-					System.out.println("프로그램을 종료합니다.");
-					return;
-				default:
-					System.out.println("=> 존재하지 않는 명령어입니다.");
 			}
 		}
+	}
+
+	private void exit(Rq rq) {
+		runState = false;
+		System.out.println("종료합니다...");
 	}
 }

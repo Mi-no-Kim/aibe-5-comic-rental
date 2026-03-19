@@ -33,6 +33,11 @@ public class App {
 		commandMap.put("comic-update", comicController::comicUpdate);
 		commandMap.put("comic-delete", comicController::comicDelete);
 
+		// rental 명령어
+		commandMap.put("rental-rent", rentalController::rentalRent);
+		commandMap.put("rental-return", rentalController::rentalReturn);
+		commandMap.put("rental-list", rentalController::rentalList);
+
 		commandMap.put("exit", this::exit);
 	}
 

@@ -53,6 +53,96 @@ comic-project/
 
 ---
 
+## database
+
+MySQL을 사용합니다.
+
+개인 데이터베이스에서 작동합니다.
+
+**테스트를 위한 공통 SQL쿼리**
+
+```sql
+use comic;
+
+-- database 삭제 후 연결
+DROP DATABASE IF EXISTS comic;
+
+CREATE DATABASE comic
+DEFAULT CHARACTER SET utf8mb4
+COLLATE utf8mb4_0900_ai_ci;
+
+-- create comic table
+DROP TABLE IF EXISTS comic.comic;
+CREATE TABLE comic.comic (
+     id INT auto_increment NOT NULL,
+     title varchar(100) NOT NULL,
+     author varchar(100) NOT NULL,
+     volume INT NOT NULL,
+     is_rental BOOL DEFAULT false NOT NULL,
+     reg_date DATE NOT NULL,
+     CONSTRAINT comic_pk PRIMARY KEY (id),
+     CONSTRAINT comic_unique UNIQUE KEY (title,author,volume)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;
+
+-- create member table
+DROP TABLE IF EXISTS comic.`member`;
+CREATE TABLE comic.`member` (
+    id INT auto_increment NOT NULL,
+    name varchar(100) NOT NULL,
+    phone varchar(100) NOT NULL,
+    reg_date DATE NOT NULL,
+    penalty_date DATE NULL,
+    CONSTRAINT member_pk PRIMARY KEY (id),
+    is_deleted BOOLEAN DEFAULT FALSE
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;
+
+-- create rental table
+DROP TABLE IF EXISTS comic.rental;
+CREATE TABLE comic.rental (
+    id INT auto_increment NOT NULL,
+    comic_id INT NOT NULL,
+    member_id INT NOT NULL,
+    rent_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    return_date DATE NULL,
+    CONSTRAINT rental_pk PRIMARY KEY (id),
+    CONSTRAINT rental_comic_FK FOREIGN KEY (comic_id) REFERENCES comic.comic(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT rental_member_FK FOREIGN KEY (member_id) REFERENCES comic.`member`(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO comic.comic (title, author, volume, is_rental, reg_date) VALUES
+    ('원피스', '오다 에이치로', 1, false, '2024-01-10'),
+    ('원피스', '오다 에이치로', 2, false, '2024-01-10'),
+    ('원피스', '오다 에이치로', 3, false, '2024-01-10'),
+    ('원피스', '오다 에이치로', 4, false, '2024-01-10'),
+    ('원피스', '오다 에이치로', 5, false, '2024-01-10'),
+    ('나루토', '키시모토 마사시', 1, false, '2024-02-01'),
+    ('나루토', '키시모토 마사시', 2, false, '2024-02-01'),
+    ('나루토', '키시모토 마사시', 3, false, '2024-02-01'),
+    ('나루토', '키시모토 마사시', 4, false, '2024-02-01'),
+    ('나루토', '키시모토 마사시', 5, false, '2024-02-01'),
+    ('진격의 거인', '이사야마 하지메', 1, false, '2024-03-15'),
+    ('원피스', '오다 에이치로', 6, false, '2024-01-10'),
+    ('진격의 거인', '이사야마 하지메', 2, false, '2024-03-15');
+
+INSERT INTO comic.member (name, phone, reg_date, penalty_date) VALUES
+    ('김민호', '010-1234-5678', '2024-01-01', NULL),
+    ('이근찬', '010-2222-3333', '2024-01-15', NULL),
+    ('이건희', '010-4444-5555', '2024-02-10', NULL),
+    ('지영재', '010-7777-8888', '2024-03-01', NULL);
+```
+
+---
+
 ## Branch 네이밍 규칙
 
 - 브랜치 이름은 모두 소문자로 케밥 케이스(`delicious-kebab`) 사용

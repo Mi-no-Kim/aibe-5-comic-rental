@@ -44,25 +44,11 @@ public class App {
 		commandMap.put("rental-list", rentalController::rentalList);
 		
 		// member
-		commandMap.put("member-add", rq -> memberController.addMember());
-		commandMap.put("member-list", rq -> memberController.showMembers());
-		commandMap.put("member-search", rq -> {
-		    String keyword = rq.getParams().get(0);
-		    memberController.searchMember(keyword);
-		});
-		commandMap.put("member-delete", rq -> {
-		    int id = Integer.parseInt(rq.getParams().get(0));
-		    memberController.deleteMember(id);
-		});
-		commandMap.put("member-update", rq -> {
-		    if (rq.getParams().size() == 0) {
-		        System.out.println("회원 id를 입력해주세요.");
-		        return;
-		    }
-
-		    int id = Integer.parseInt(rq.getParams().get(0));
-		    memberController.updateMember(id);
-		});
+		commandMap.put("member-add", memberController::addMember);
+		commandMap.put("member-list",memberController::showMembers);
+		commandMap.put("member-search",memberController::searchMember);
+		commandMap.put("member-delete", memberController::deleteMember);
+		commandMap.put("member-update",memberController::updateMember);
 
 		
 

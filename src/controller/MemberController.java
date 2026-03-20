@@ -4,11 +4,12 @@ import java.util.Scanner;
 
 import domain.Member;
 import repository.MemberRepository;
+import util.Rq;
 //콘솔 담당
 public class MemberController {
 	Scanner sc = new Scanner(System.in);
 //	TODO: 회원 등록 (member-add)
-	public void addMember() {
+	public void addMember(Rq rq) {
 		System.out.print("이름: ");
 		
 		String name = sc.nextLine();
@@ -36,7 +37,7 @@ public class MemberController {
 		
 	
 //	TODO: 회원 목록 조회 (member-list)
-   public void showMembers() {
+   public void showMembers(Rq rq) {
 	   MemberRepository memberRepository = new MemberRepository();
 	    List<Member> list = memberRepository.findAll();
 	    System.out.println("\n회원 목록");
@@ -58,10 +59,10 @@ public class MemberController {
    
    
 //	TODO: 회원 검색 (member-search)
-   public void searchMember(String keyword) {
+   public void searchMember(Rq rq) {
 
 	    MemberRepository memberRepository = new MemberRepository();
-
+	    String keyword = rq.getParams().get(0);
 	    List<Member> list = memberRepository.searchMember(keyword);
 
 	    if (list.isEmpty()) {
@@ -82,11 +83,18 @@ public class MemberController {
 
 
 //	TODO: 회원 수정 (member-update)
-	public void updateMember(int memberId) {
-		Scanner sc = new Scanner(System.in);
+	public void updateMember(Rq rq) {
+		List<String> params = rq.getParams();
+
+	    if (params.size() == 0) {
+	        System.out.println("회원 id를 입력해주세요.");
+	        return;
+	    }
+
+	    int memberId = Integer.parseInt(params.get(0));
+
 	    MemberRepository memberRepository = new MemberRepository();
 
-	    // 기존 회원 조회
 	    Member m = memberRepository.findById(memberId);
 
 	    if (m == null) {
@@ -112,13 +120,20 @@ public class MemberController {
 	}
 
 //	TODO: 회원 삭제 (member-delete)
-   public void deleteMember(int memberId) {
+   public void deleteMember(Rq rq) {
+	   List<String> params = rq.getParams();
 
+	    if (params.size() == 0) {
+	        System.out.println("회원 id를 입력해주세요.");
+	        return;
+	    }
+
+	    int memberId = Integer.parseInt(params.get(0));
 	    MemberRepository memberRepository = new MemberRepository();
 
 	    // 1. 먼저 조회 (SELECT)
 	    Member member = memberRepository.findById(memberId);
-
+	    
 	    if (member == null) {
 	        System.out.println("=> 해당 회원이 존재하지 않습니다.");
 	        return;

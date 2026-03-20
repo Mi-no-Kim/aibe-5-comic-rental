@@ -21,6 +21,7 @@ public class App {
 	private final DateHolder dateHolder = new DateHolder();
 
 	private final HashMap<String, Consumer<Rq>> commandMap = new HashMap<>();
+	private final HashMap<String, String> helpMap = new HashMap<>();
 
 	private boolean runState = true;
 
@@ -50,12 +51,12 @@ public class App {
 		commandMap.put("member-delete", memberController::deleteMember);
 		commandMap.put("member-update",memberController::updateMember);
 
-		
-
 		commandMap.put("exit", this::exit);
 		commandMap.put("help", this::help);
 		commandMap.put("date-show", this::dateShow);
 		commandMap.put("date-change", this::dateChange);
+
+		// setHelpMap();
 	}
 
 	public void run() {
@@ -85,19 +86,80 @@ public class App {
 
 				continue;
 			}
-			
-
-			
-			}
 		}
+	}
 
 	private void exit(Rq rq) {
 		runState = false;
 		System.out.println("종료합니다...");
 	}
 
+	private void setHelpMap() {
+		String command;
+		StringBuilder sb = new StringBuilder();
+
+		// template
+		// command = "comic-add";
+		// sb.setLength(0);
+		//
+		// helpMap.put(command, sb.toString());
+
+		// [만화]
+		command = "comic-list";
+		sb.setLength(0);
+		sb.append("■ comic-list\n");
+		sb.append("    OPTIONS\n");
+		sb.append(String.format("      %-40s->", "--asc"))
+			.append(" 오름차순 정렬 (기본 정렬 방향)\n");
+		sb.append(String.format("      %-40s->", "--desc"))
+			.append(" 내림차순 정렬\n");
+		sb.append("\n");
+		sb.append("    OUTPUT\n");
+		sb.append("      성공: 만화 목록 출력\n");
+		sb.append("      실패: 에러 메세지\n");
+		sb.append("\n");
+		sb.append("    SORT RULE\n");
+		sb.append("      [comic.regDate]에 대해 --asc 또는 --desc가 적용된다.\n");
+		helpMap.put(command, sb.toString());
+	}
+
 	private void help(Rq rq) {
-		System.out.println("추가하겠습니다... 도움!!!");
+		StringBuilder sb = new StringBuilder();
+		// if (rq.getParams().size() == 0)
+		// sb.append("help 뒤에 궁금한 command를 입력해주세요.\n");
+		// sb.append("예시: help comic-add\n");
+		// sb.append("\n");
+		sb.append("------------------ 명령어 목록 ------------------\n");
+		sb.append("[만화]\n");
+		sb.append(String.format("%-20s: %s\n", "comic-add", "만화책 등록"));
+		sb.append(String.format("%-20s: %s\n", "comic-list", "만화책 목록"));
+		sb.append(String.format("%-20s: %s\n", "comic-detail", "만화책 상세 보기"));
+		sb.append(String.format("%-20s: %s\n", "comic-search", "만화책 수정"));
+		sb.append(String.format("%-20s: %s\n", "comic-update", "만화책 등록"));
+		sb.append(String.format("%-20s: %s\n", "comic-delete", "만화책 삭제"));
+		sb.append("\n");
+		sb.append("[회원]\n");
+		sb.append(String.format("%-20s: %s\n", "member-add", "회원 등록"));
+		sb.append(String.format("%-20s: %s\n", "member-list", "회원 목록"));
+		sb.append(String.format("%-20s: %s\n", "member-search", "회원 검색"));
+		sb.append(String.format("%-20s: %s\n", "member-update", "회원 정보 수정"));
+		sb.append(String.format("%-20s: %s\n", "member-delete", "회원 삭제"));
+		sb.append("\n");
+		sb.append("[대여]\n");
+		sb.append(String.format("%-20s: %s\n", "rental-rent", "만화 대여"));
+		sb.append(String.format("%-20s: %s\n", "rental-return", "만화 반납"));
+		sb.append(String.format("%-20s: %s\n", "rental-list", "대여 목록"));
+		sb.append("\n");
+		sb.append("[기타]\n");
+		sb.append(String.format("%-20s: %s\n", "date-show", "현재 날짜"));
+		sb.append(String.format("%-20s: %s\n", "date-change", "날짜 변경"));
+		sb.append(String.format("%-20s: %s\n", "exit", "종료"));
+
+		// else {
+		// 	String param = rq.getParams().get(0);
+		// 	System.out.println(helpMap.get(param));
+		// }
+		System.out.println(sb);
 	}
 
 	private void dateShow(Rq rq) {

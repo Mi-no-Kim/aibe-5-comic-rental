@@ -2,6 +2,8 @@ package app;
 
 import util.DateHolder;
 import util.Rq;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.function.Consumer;
@@ -65,6 +67,9 @@ public class App {
 		
 
 		commandMap.put("exit", this::exit);
+		commandMap.put("help", this::help);
+		commandMap.put("date-show", this::dateShow);
+		commandMap.put("date-change", this::dateChange);
 	}
 
 	public void run() {
@@ -103,5 +108,35 @@ public class App {
 	private void exit(Rq rq) {
 		runState = false;
 		System.out.println("종료합니다...");
+	}
+
+	private void help(Rq rq) {
+		System.out.println("추가하겠습니다... 도움!!!");
+	}
+
+	private void dateShow(Rq rq) {
+		System.out.println(dateHolder.getDate());
+	}
+
+	private void dateChange(Rq rq) {
+		String param = rq.getParams().get(0);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(dateHolder.getDate()).append(" -> ");
+
+		// now
+		if ("--now".equals(param)) {
+			dateHolder.setDate(LocalDate.now());
+		} else {
+			String[] date = rq.getParams().get(0).split("-");
+			LocalDate newDate = LocalDate.of(
+				Integer.parseInt(date[0]),
+				Integer.parseInt(date[1]),
+				Integer.parseInt(date[2])
+			);
+			dateHolder.setDate(newDate);
+		}
+		sb.append(dateHolder.getDate());
+		System.out.println(sb);
 	}
 }

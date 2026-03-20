@@ -1,6 +1,7 @@
-package repository;
+package test.repository;
 
 import domain.Rental;
+import repository.RentalRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

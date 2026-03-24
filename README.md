@@ -59,6 +59,9 @@ MySQL을 사용합니다.
 
 개인 데이터베이스에서 작동합니다.
 
+![ERD](https://github.com/user-attachments/assets/65caf4f5-66e0-461b-a150-3edc6e0e0d71)
+
+
 **테스트를 위한 공통 SQL쿼리**
 
 ```sql
